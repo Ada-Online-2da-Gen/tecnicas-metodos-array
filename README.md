@@ -1,4 +1,4 @@
-# Tips, técnicas y estrategias para operar con arrays de objetos y métodos de arrays
+# Trabajando con métodos de array
 
 Un primer criterio a chequear para decidir que método utilizar es, dado el array sobre el que estamos operando,
   * ¿tenemos que mantener la cantidad de items?
@@ -137,6 +137,7 @@ const aPromedio = (total, numero, index, array) => {
 
 [1, 2, 3].reduce(aPromedio) // 2 
 ```
+<br>
 
 ### Reducir un array 2D a uno 1D
 
@@ -208,6 +209,7 @@ const resultado = personas.reduce(aPersonaConMasDinero)
   dinero: 1200
 }
 ```
+<br>
 
 ### Array de objetos a objeto con keys
 
@@ -229,6 +231,7 @@ const resultado = animales.map(aAnimalConComida)
   canario: "semillas"
 ]
 ```
+<br>
 
 ### Reducir una estructura de datos compleja
 
@@ -246,6 +249,7 @@ const resultado = lista.reduce(aColores, [])
 // resultado
 ["azul", "verde", "verde", "negro", "naranja", "azul", "verde", "rojo"]
 ```
+<br>
 
 ### Eliminar valores repetidos
 
