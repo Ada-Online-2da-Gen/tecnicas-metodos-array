@@ -263,3 +263,46 @@ const resultado = colores.reduce(aValoresUnicos, [])
 // resultado
 ["azul", "verde", "negro", "naranja", "rojo"]
 ```
+
+### Obtener mayor cantidad de un dato en una estructura compleja
+
+```js
+const animales = [
+  { nombre: 'Sapo' }, 
+  { nombre: 'Leon' },
+  { nombre: 'Foca' },
+  { nombre: 'Sapo' }
+]
+
+const animaConMasCantidad = (animales) => {
+  /**
+   * aCantidadDeAnimales recorre el array de objetos original, y
+   * devuelve un objeto con cada nombre de animal como propiedad
+   * y la cantidad como valor
+   * 
+   * {
+   *  Sapo: 2,
+   *  Leon: 1,
+   *  Foca: 1
+   * }
+   */
+
+  const aCantidadDeAnimales = (cuenta, animales) => {
+    cuenta[animales.nombre] = cuenta[animales.nombre] + 1 || 1
+    return cuenta
+  }
+  
+  const conMayorCantidad = (masCantidad, animal, animales) => 
+    animales[animal] > animales[masCantidad] ? animal : masCantidad
+
+  // Reducimos el array original a un objeto con la cantidad de cada animal  
+  const cantidades = animales.reduce(aCantidadDeAnimales, {})
+  
+  // Obtenemos las keys de dicho array, es decir, los nombres de los animales
+  // ["Sapo", "Leon", "Foca"]
+  const nombresAnimales = Object.keys(cantidades)
+    
+  return nombresAnimales.
+    reduce((masCantidad, animal) => conMayorCantidad(masCantidad, animal, animales))  
+}
+```
