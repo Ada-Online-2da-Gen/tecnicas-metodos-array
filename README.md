@@ -15,11 +15,17 @@ Un primer criterio a chequear para decidir que método utilizar es, dado el arra
 
 ### Llamar a una función por cada ítem
 
+Cuando tenemos un array, y queremos realizar un conjunto de operaciones sobre cada uno de los ítems del array, y obtener el resultado de cada una de esas operaciones en el array.
+
 ```js
+// datos iniciales
 const numeros = [5, 8, 19, 22]
 
+// operación a realizar por cada ítem
+// es el callback de map que devuelve el resultado de tomar el ítem y realizarle una operación
 const duplicar = x => x * 2
 
+// mapeamos el array original a un nuevo array con los resultados de cada una de las operaciones
 const resultado = numeros.map(duplicar)
 
 //resultado
@@ -27,15 +33,22 @@ const resultado = numeros.map(duplicar)
 ```
 <br>
 
-### Extraer los valores de la propiedad que nos interesa
+### Extraer los valores de estructura de datos complejas
+
+Cuando tenemos estructuras de datos complejas (array de objetos, a veces donde cada objeto tiene anidados otros objetos o arrays) a veces nos conviene primero "limpiar" los datos que no nos interesan y quedarnos sólo con aquellos que necesitemos manipular, de esta forma es más fácil trabajar con ellos.
+
+Para eso mapeamos de los objetos del array original a una de sus propiedades
 
 ```js
+// datos iniciales
 const personas = [
   {nombre: "Juan", dinero: 550},
   {nombre: "María", dinero: 1200},
   {nombre: "Carlos", dinero: 889}
 ]
 
+// mapeamos cada objeto a una de sus propiedades
+// para eso el callback del map toma un ítem y devuelve esa propiedad
 const aDinero = persona => persona.dinero
 
 const resultado = personas.map(aDinero)
@@ -47,13 +60,20 @@ const resultado = personas.map(aDinero)
 
 ### Formatear objetos
 
+Podemos cambiar el formato o la estructura de cada objeto, por una que nos resulte más prática para trabajar. Por ejemplo, en el caso siguiente, si de `animales` quisiéramos encontrar "conejo", tendríamos que usar `find` y pasarle un callback, en cambio si "conejo" fuese una propiedad, solo tendríamos que hacer `animales["conejo"]`
+
+Para eso, mapeamos el array original, devolviendo un nuevo objeto con la estructura que necesitemos. Podemos usar spread o destructuring si lo requiere.
+
 ```js
+// datos originales
 const animales = [
   { nombre: "conejo", comida: "zanahoria" },
   { nombre: "tortuga", comida: "lechuga" },
   { nombre: "canario", comida: "semillas" }
 ]
 
+// mapeamos cada ítem a un nuevo objeto
+// en este caso, el objeto tiene como propiedad el valor de una de sus propiedades, que se asigna dinámicamente
 const aAnimalConComida = animal => ({[animal.nombre]: animal.comida})
 
 const resultado = animales.map(aAnimalConComida)
@@ -69,16 +89,19 @@ const resultado = animales.map(aAnimalConComida)
 
 ### Modificar objetos
 
-Podemos agregar propiedades, borrar propiedades, modificar propiedades. Combinar con uso del destructuring y el spread.
+Podemos agregar propiedades, borrar propiedades y modificar propiedades de un objeto, usando spread y destructuring si hace falta.
 
 ```js
+// datos originales
 const personas = [
   { nombre: "Juan", dinero: 550 },
   { nombre: "María", dinero: 1200 },
   { nombre: "Carlos", dinero: 889 }
 ]
 
-const aDineroAumentado = persona => {...persona, dinero: dinero.persona + 1000}
+// callback del map que se llama por cada objeto
+// devolvemos un nuevo objeto con las propiedades iniciales, cambiándole el valor de una de ellas
+const aDineroAumentado = persona => ({...persona, dinero: persona.dinero + 1000})
 
 const resultado = personas.map(aDineroAumentado)
 
@@ -93,9 +116,14 @@ const resultado = personas.map(aDineroAumentado)
 
 ### Convertir un tipo de dato en otro
 
+Podemos tomar un array de un tipo de datos, y mapearlo a un array de otro tipo de datos. Por ejemplo, en este caso, de un array de strigs pasamos a un array de objetos que contienen el dato original e información extra.
+
 ```js
+// datos originales
 const palabras = ["javascript", "map", "filter", "array"]
 
+// callback del map
+// cada string es mapeado a un objeto
 const aCantidadDeLetras = palabra => ({ palabra, letras: palabra.length })
 
 const resultado = palabras.map(aCantidadDeLetras)
@@ -113,11 +141,17 @@ const resultado = palabras.map(aCantidadDeLetras)
 
 ## `reduce`
 
-### Reducir un conjunto de valores a un único valor del mismo tipo, realizando una operación sobre ellos
+### Realizar una operación sobre un conjunto de valores
+
+Cuando tenemos varios datos del mismo tipo, y queremos hacer un operación con todos ellos (sumarlos, multiplicarlos) y obtener el resultado total
 
 ```js
+// datos originales
 const numeros = [1, 3, 4, 10]
 
+// callback del reduce
+// sumaParcial es el acumulador, que comienza con el primer ítem del array, y numero comienza con el segundo
+// en cada vuelta, devolvemos la suma del numero actual con la sumaParcial (es decir, con la suma de todos los números anteriores al actual)
 const aSumaTotal = (sumaParcial, numero) => sumaParcial + numero
 
 const resultado = numeros.reduce(aSumaTotal)
@@ -128,6 +162,8 @@ const resultado = numeros.reduce(aSumaTotal)
 <br>
 
 ### Obtener el promedio
+
+Para obtener el promedio con un único `reduce`, necesitamos sus parámetros extras, que son el índice y el array. Lo que hacemos es sumar todos los números, y chequear si el índice es igual al último del array (`array.length - 1`), si lo es devolvemos la suma dividido la cantidad de ítems del array, sino devolvemos la suma hasta el momento
 
 ```js
 const aPromedio = (total, numero, index, array) => {
@@ -141,6 +177,8 @@ const aPromedio = (total, numero, index, array) => {
 
 ### Reducir un array 2D a uno 1D
 
+Para poder hacerlo, necesitamos devolver siempre un array (que va siendo el valor de `arrayParcial`). Este array contiene todos los ítems de `arrayParcial` hasta el momento y todos los ítems del array que estamos recorriendo (que los insertamos mediante spread). Como siempre estamos devolviendo un array, al finalizar la iteración nos va a quedar un único array.
+
 ```js
 const numeros = [
   [2, 4, 3],
@@ -148,7 +186,7 @@ const numeros = [
   [0, 5, 6]
 ]
 
-const aArray1D = (arrayParcial, array) => [...arrayParcial, array]
+const aArray1D = (arrayParcial, array) => [...arrayParcial, ...array]
 
 const resultado = numeros.reduce(aArray1D)
 
@@ -157,7 +195,23 @@ const resultado = numeros.reduce(aArray1D)
 ```
 <br>
 
+En la primera iteración, `arrayParcial` es `[2, 4, 3]`, `array` es `[7, 1, 9]` (ítems del array que estamos recorriendo). Como devolvermos un nuevo array con los ítems de ambos, en la siguiente vuelta `arrayParcial` es `[2, 4, 3, 7, 1, 9]`, `array` es `[0, 5, 6]`. Al devolver de nuevo un nuevo array con la concatenación de ambos, el resultado final nos queda en un array único con todos los ítems.
+
+Esto es exactamante lo mismo que usar el método `flat()` sobre números, pero es interesante cómo podemos lograrlo con `reduce`, ya que a veces los arrays se encuentran dentro de propiedades de objetos, y en ese caso no nos sirve `flat`.
+
+
 ### Contar la cantidad de repeticiones de cada elemento
+
+Podemos obtener un objeto donde obtengamos la cantidad de ítems en un array (o la cuenta de algo), donde cada cosa que queremos contar o medir es la propiedad, y el dato su valor. No solo podemos obtener la cuenta de algo, sino el resultado de ciertas operaciones, como el promedio, la suma, etc.
+
+Para eso tenemos que: 
+ 1. pasarle a `reduce` un segundo parámetro, ya que lo que queremos devolver es distinto a lo que estamos iterando.
+ 2. `cuentaParcial` comienza teniendo este objeto vacío, y como vamos devolver en cada vuelta `cuentaParcial`, siempre va a ser un objeto
+ 3. `pais` es cada uno de los strings/ítems que estamos recorriendo
+ 4. en cada iteración, a la propiedad correspondiente al item en el objeto (que lo accedemos de forma dinámica `cuentaParcial[pais]`), le sumamos 1. 
+ 5. en caso de que esa propiedad no exista, `cuentaParcial[pais]` va a devolver `undefined`, por lo tanto si sumamos 1 nos va a dar `NaN`, que se va a asignar a dicha propiedad, y toda suma siguiente va a dar `NaN`
+ 6. por lo tanto, si obtenemos `NaN`, como es un valor falso, podemos usar el circuito de evaluación corto para devolver un valor es caso de que `NaN` ocurra, en este caso 1, porque sería la primera que nos encontramos con dicho valor que queremos medir
+ 7. otra forma de escribir `cuentaParcial[pais] + 1 || 1` es `(cuentaParcial[pais] || 0) + 1`
 
 ```js
 const paises = ["Argentina", "Uruguay", "Bolivia", "Argentina", "Argentina", "Uruguay", "Chile"]
@@ -167,7 +221,7 @@ const aCantidad = (cuentaParcial, pais) => {
   return cuentaParcial
 }
 
-const resultado = paises.reduce(aCantidad)
+const resultado = paises.reduce(aCantidad, {})
 
 // resultado
 {
