@@ -382,6 +382,6 @@ const animaConMasCantidad = (animales) => {
   const nombresAnimales = Object.keys(cantidades)
     
   return nombresAnimales.
-    reduce((masCantidad, animal) => conMayorCantidad(masCantidad, animal, animales))  
+    reduce((masCantidad, animal) => conMayorCantidad(masCantidad, animal, cantidades))  
 }
 ```
