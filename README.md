@@ -193,12 +193,28 @@ const resultado = numeros.reduce(aArray1D)
 // resultado
 [2, 4, 3, 7, 1, 9, 0, 5, 6]
 ```
-<br>
 
 En la primera iteración, `arrayParcial` es `[2, 4, 3]`, `array` es `[7, 1, 9]` (ítems del array que estamos recorriendo). Como devolvermos un nuevo array con los ítems de ambos, en la siguiente vuelta `arrayParcial` es `[2, 4, 3, 7, 1, 9]`, `array` es `[0, 5, 6]`. Al devolver de nuevo un nuevo array con la concatenación de ambos, el resultado final nos queda en un array único con todos los ítems.
 
 Esto es exactamante lo mismo que usar el método `flat()` sobre números, pero es interesante cómo podemos lograrlo con `reduce`, ya que a veces los arrays se encuentran dentro de propiedades de objetos, y en ese caso no nos sirve `flat`.
 
+Cuando no podemos usar `flat`, por ejemplo porque es un array de objetos, podemos usar la misma técnica:
+
+```js
+const lista = [
+  { colores: ["azul", "verde"] }, 
+  { colores: ["verde", "negro", "naranja", "azul"] }, 
+  { colores: ["verde", "rojo"] }
+]
+
+const aColores = (listaParcial, item) => [...listaParcial, ...item.colores]
+
+const resultado = lista.reduce(aColores, [])
+
+// resultado
+["azul", "verde", "verde", "negro", "naranja", "azul", "verde", "rojo"]
+```
+<br>
 
 ### Contar la cantidad de repeticiones de cada elemento
 
@@ -235,6 +251,8 @@ const resultado = paises.reduce(aCantidad, {})
 
 ## Encontrar el elemento que tenga el mayor o menor valor
 
+La estrategia consiste en que el callback devuelva el elemento actual o el mayor hasta el momento, dependiendo de cúal sea el más grande (o chico, si medimos eso). Como siempre devolvemos un elemento (el que mejor cumpla la condición), en la próxima vuelta vamos a tener ese elemento para compararlo con el próximo.
+
 ```js
 const numeros = [33, 2, 5, 17, 88 ,29]
 
@@ -263,9 +281,21 @@ const resultado = personas.reduce(aPersonaConMasDinero)
   dinero: 1200
 }
 ```
+
+Suponiendo el primer ejemplo:
+- Iteración 1: `mayor` es 32, `numero` es 2. Devolvemos 32.
+- Iteración 2: `mayor` es 32, `numero` es 5. Devolvemos 32.
+- Iteración 3: `mayor` es 32, `numero` es 17. Devolvemos 32.
+- Iteración 4: `mayor` es 32, `numero` es 88. Devolvemos 88.
+- Iteración 5: `mayor` es 88, `numero` es 29. Devolvemos 88.
+
 <br>
 
 ### Array de objetos a objeto con keys
+
+Muchas veces tenemos una cierta estructura de datos (un array de objetos), y necesitamos hacer operaciones constantemente sobre ciertos elementos, buscándolos por alguna propiedad. Para eso podemos usar `find`, pero también podémos reducir el array a un objeto, donde cada valor de la propiedad que nos interesa sea una propiedad del objeto, de modo que podamos recorrerlas y accederlas dinámicante de forma más sencillamente.
+
+Para eso necesitamos un nuevo objeto como segundo parámetro del `reduce` (ya que la estructura del resultado que queremos obtener es distinta del ítem que recorremos), y por cada ítem, devolvemos un nuevo objeto con todo lo que contenía el objeto parcial hasta el momento, usando spread, y una propiedad nueva con su valor. Dicha propiedad, como es dinámica, necesitamos definirla con la notación de corchetes.
 
 ```js
 const animales = [
@@ -276,7 +306,7 @@ const animales = [
 
 const aAnimalConComida = (animales, animal) => ({...animales, [animal.nombre]: animal.comida})
 
-const resultado = animales.map(aAnimalConComida)
+const resultado = animales.map(aAnimalConComida, {})
 
 // resultado
 { 
@@ -287,25 +317,9 @@ const resultado = animales.map(aAnimalConComida)
 ```
 <br>
 
-### Reducir una estructura de datos compleja
-
-```js
-const lista = [
-  { colores: ["azul", "verde"] }, 
-  { colores: ["verde", "negro", "naranja", "azul"] }, 
-  { colores: ["verde", "rojo"] }
-]
-
-const aColores = (listaParcial, item) => [...listaParcial, ...item.colores]
-
-const resultado = lista.reduce(aColores, [])
-
-// resultado
-["azul", "verde", "verde", "negro", "naranja", "azul", "verde", "rojo"]
-```
-<br>
-
 ### Eliminar valores repetidos
+
+Para eliminar valores repetidos en un array, la estrategia es comenzar con un array vacío, ya que queremos obtener un array y estamos recorriendo otros ítems. En cada vuelta, chequeamos si el item se encuentra en el array, si lo está, devolvemos el array tal cual, sino devolvemos un nuevo array con todos los ítems que teníamos hasta el momento (usando spread) y el item que estamos recorriendo
 
 ```js
 const colores = ["azul", "verde", "verde", "negro", "naranja", "azul", "verde", "rojo"]
@@ -317,6 +331,17 @@ const resultado = colores.reduce(aValoresUnicos, [])
 // resultado
 ["azul", "verde", "negro", "naranja", "rojo"]
 ```
+
+En el ejemplo:
+- Iteración 1: `lista` es `[]`, item es `"azul"`, devolvemos `["azul"]`
+- Iteración 2: `lista` es `["azul"]`, item es `"verde"`, devolvemos `["azul", "verde"]`
+- Iteración 3: `lista` es `["azul", "verde"]`, item es `"verde"`, devolvemos `["azul", "verde"]`
+- Iteración 4: `lista` es `["azul", "verde"]`, item es `"negro"`, devolvemos `["azul", "verde", "negro"]`
+- Iteración 5: `lista` es `["azul", "verde", "negro"]`, item es `"naranja"`, devolvemos `["azul", "verde", "negro", "naranja"]`
+- Iteración 6: `lista` es `["azul", "verde", "negro", "naranja"]`, item es `"azul"`, devolvemos `["azul", "verde", "negro", "naranja"]`
+- Iteración 7: `lista` es `["azul", "verde", "negro", "naranja"]`, item es `"azul"`, devolvemos `["azul", "verde", "negro", "naranja"]`
+- Iteración 8: `lista` es `["azul", "verde", "negro", "naranja"]`, item es `"rojo"`, devolvemos `["azul", "verde", "negro", "naranja", "rojo"]`
+<br>
 
 ### Obtener mayor cantidad de un dato en una estructura compleja
 
