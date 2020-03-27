@@ -216,7 +216,7 @@ const resultado = lista.reduce(aColores, [])
 ```
 <br>
 
-### Contar la cantidad de repeticiones de cada elemento
+### Contar la cantidad de repeticiones
 
 Podemos obtener un objeto donde obtengamos la cantidad de ítems en un array (o la cuenta de algo), donde cada cosa que queremos contar o medir es la propiedad, y el dato su valor. No solo podemos obtener la cuenta de algo, sino el resultado de ciertas operaciones, como el promedio, la suma, etc.
 
@@ -249,7 +249,7 @@ const resultado = paises.reduce(aCantidad, {})
 ```
 <br>
 
-## Encontrar el elemento que tenga el mayor o menor valor
+## Encontrar el elemento con mayor o menor valor
 
 La estrategia consiste en que el callback devuelva el elemento actual o el mayor hasta el momento, dependiendo de cúal sea el más grande (o chico, si medimos eso). Como siempre devolvemos un elemento (el que mejor cumpla la condición), en la próxima vuelta vamos a tener ese elemento para compararlo con el próximo.
 
@@ -345,6 +345,21 @@ En el ejemplo:
 
 ### Obtener mayor cantidad de un dato en una estructura compleja
 
+- Reducimos el array original a un objeto con los nombres de los animales como propiedades y la cantidad de repeticiones como valores, con la técnica de *Contar la cantidad de repeticiones*, para lo cual usamos el callback `aCantidadDeAnimales` que recorre el array de objetos original, y devuelve un objeto con cada nombre de animal como propiedad y la cantidad como valor. Ese objeto se guarda en `cantidades`, y queda así:
+```js
+{
+ Sapo: 2,
+ Leon: 1,
+ Foca: 1
+}
+```
+- Obtenemos las keys de dicho objetos, es decir, los nombres de los animales, con `Object.keys(obj)`. Eso nos devuelve el array `["Sapo", "Leon", "Foca"]`, que lo guardamos en `nombreAnimales`
+- Con esas keys, podemos acceder a la cantidad de cada animal de forma dinámica, p. ej.: `animales[animal]`
+- Tenemos que usar la técnica de *Encontrar el elemento con mayor o menor valor*, pero tenemos un problema: el valor que queremos devolver es un string (la propiedad), y el queremos contrastar es el valor de dicha propiedad
+- Para eso nuestro callback necesita un dato extra, el objeto con las cantidades. Lo que vamos a hacer es recorrer los nombres de los animales (las keys), e ir obteniendo el valor de cada animal. 
+- Como nos interesa solo el nombre, lo que vamos a hacer es ir recorriendo cada nombre. Por cada nombre, accedemos de forma dinámica al valor que contiene el objeto en dicha propiedad, y lo comparamos con el valor del nombre guardado hasta el momento (en el acumulador). Dependiendo de qué valor es más alto, devolvemos uno u otro nombre. Eso lo hacemos en la función `conMayorCantidad`
+- Como el tercer parámetro de `conMayorCantidad` es algo que no se encuentra en el array que vamos a recorrer (`nombresAnimales`), no podemos llamar a la función directamente con `.reduce(conMayorCantidad)`
+
 ```js
 const animales = [
   { nombre: 'Sapo' }, 
@@ -354,18 +369,6 @@ const animales = [
 ]
 
 const animaConMasCantidad = (animales) => {
-  /**
-   * aCantidadDeAnimales recorre el array de objetos original, y
-   * devuelve un objeto con cada nombre de animal como propiedad
-   * y la cantidad como valor
-   * 
-   * {
-   *  Sapo: 2,
-   *  Leon: 1,
-   *  Foca: 1
-   * }
-   */
-
   const aCantidadDeAnimales = (cuenta, animales) => {
     cuenta[animales.nombre] = cuenta[animales.nombre] + 1 || 1
     return cuenta
@@ -374,11 +377,8 @@ const animaConMasCantidad = (animales) => {
   const conMayorCantidad = (masCantidad, animal, animales) => 
     animales[animal] > animales[masCantidad] ? animal : masCantidad
 
-  // Reducimos el array original a un objeto con la cantidad de cada animal  
   const cantidades = animales.reduce(aCantidadDeAnimales, {})
   
-  // Obtenemos las keys de dicho array, es decir, los nombres de los animales
-  // ["Sapo", "Leon", "Foca"]
   const nombresAnimales = Object.keys(cantidades)
     
   return nombresAnimales.
